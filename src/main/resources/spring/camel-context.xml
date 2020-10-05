@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd  http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+    
+	<!-- Import Processor -->
+    <bean class="ar.com.demo.processors.CreateRequestProcessor" id="createRequestProcessor"/>
+    
+    <!-- Discovers the ActiveMQ service dynamically -->
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="jmsConnectionFactory">
+        <property name="brokerURL" value="${jms.brokerURL}"/>
+        <property name="userName" value="${jms.userName}"/>
+        <property name="password" value="${jms.password}"/>
+        <property name="trustAllPackages" value="true"/>
+    </bean>
+    
+    <bean class="org.apache.activemq.pool.PooledConnectionFactory"
+        destroy-method="stop" id="pooledConnectionFactory"
+        init-method="start" primary="true">
+        <property name="maxConnections" value="${jms.maxConnections}"/>
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+    </bean>
+    
+    <bean
+        class="org.apache.activemq.camel.component.ActiveMQConfiguration" id="jmsConfig">
+        <property name="connectionFactory" ref="pooledConnectionFactory"/>
+        <property name="concurrentConsumers" value="${jms.concurrentConsumers}"/>
+    </bean>
+    
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
+        <property name="configuration" ref="jmsConfig"/>
+    </bean>
+    
+    
+    <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
+        
+        <!-- Rest General Configurations -->
+        <restConfiguration component="jetty" port="8180" host="localhost" apiContextPath="/swagger" apiContextRouteId="swagger" contextPath="/demo" enableCORS="true">
+	        <apiProperty key="api.title" value="Microservice - Camel - Rest DSL - Archetype"/>
+	        <apiProperty key="api.description" value="Open Dev Solutions Spring boot archetype"/>
+	        <apiProperty key="api.version" value="0.1"/>
+	        <apiProperty key="api.port" value="8180"/>
+        </restConfiguration>
+        
+        <!-- Entity Example Rest -->
+        <rest path="/get-to-legacy">
+			<description>Realizar una consulta a la app legacy</description>
+			<get uri="/get-to-soap" produces="application/json">
+				<description>LLamado al Soap uppercaseWordsWithToken</description>
+				<camel:param name="string" type="query" required="true" />
+				<camel:param name="user" type="header" required="true" />
+				<camel:param name="pass" type="header" required="true" />
+				<responseMessage message="Return all examples." code="200" />
+				<responseMessage message="Bad connection to DB." code="500" />
+					<to uri="direct:demoSoap"/>
+			</get>
+	    </rest>
+	    
+	    <rest path="/test-security">
+			<description>Realizar una consulta a la app legacy</description>
+			<get uri="/get-internal-service" produces="application/json">
+				<description>LLamado a un servicio interno con seguridad</description>
+				<camel:param name="user" type="header" required="true" />
+				<camel:param name="pass" type="header" required="true" />
+				<responseMessage message="Return all examples." code="200" />
+				<responseMessage message="Bad connection to DB." code="500" />
+					<!-- <to uri="direct:callSSO"/>
+					 --> <to uri="direct:sendInternalServices"/>
+			</get>
+	    </rest>
+	    
+	    <rest path="/message-queues">
+			<description>Realizar una consulta a la app legacy</description>
+			<get uri="/push-request-to-queue" produces="application/json">
+				<description>Envio a la cola de mensajeria el request</description>
+				<camel:param name="user" type="header" required="true" />
+				<camel:param name="pass" type="header" required="true" />
+				<responseMessage message="Return all examples." code="200" />
+				<responseMessage message="Bad connection to DB." code="500" />
+					<to uri="activemq:queue:rqs?exchangePattern=InOnly"/>
+			</get>
+	    </rest>
+    </camelContext>
+</beans>
