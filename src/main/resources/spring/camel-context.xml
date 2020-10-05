@@ -58,7 +58,7 @@
 			</get>
 	    </rest>
 	    
-	    <rest path="/test-security">
+	    <!--<rest path="/test-security">
 			<description>Realizar una consulta a la app legacy</description>
 			<get uri="/get-internal-service" produces="application/json">
 				<description>LLamado a un servicio interno con seguridad</description>
@@ -66,10 +66,10 @@
 				<camel:param name="pass" type="header" required="true" />
 				<responseMessage message="Return all examples." code="200" />
 				<responseMessage message="Bad connection to DB." code="500" />
-					<!-- <to uri="direct:callSSO"/>
-					 --> <to uri="direct:sendInternalServices"/>
+					 <to uri="direct:callSSO"/>
+					  <to uri="direct:sendInternalServices"/>
 			</get>
-	    </rest>
+	    </rest>-->
 	    
 	    <rest path="/message-queues">
 			<description>Realizar una consulta a la app legacy</description>
