@@ -37,7 +37,7 @@
     <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
         
         <!-- Rest General Configurations -->
-        <restConfiguration component="jetty" port="8180" host="localhost" apiContextPath="/swagger" apiContextRouteId="swagger" contextPath="/demo" enableCORS="true">
+        <restConfiguration component="jetty" port="8180" host="0.0.0.0" apiContextPath="/swagger" apiContextRouteId="swagger" contextPath="/demo" enableCORS="true">
 	        <apiProperty key="api.title" value="Microservice - Camel - Rest DSL - Archetype"/>
 	        <apiProperty key="api.description" value="Open Dev Solutions Spring boot archetype"/>
 	        <apiProperty key="api.version" value="0.1"/>

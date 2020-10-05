@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SwaggerConfig {
     @RequestMapping("/swagger-ui")
     public String redirectToUi(HttpServletRequest request) {
-        return "redirect:/webjars/swagger-ui/index.html?url=http://" + request.getServerName()  + ":8180/demo/swagger&validatorUrl=";
+        return "redirect:/webjars/swagger-ui/index.html?url=http://" + request.getServerName()  + "/demo/swagger&validatorUrl=";
     }
 }
