@@ -13,7 +13,6 @@ public class SendInternalApiRouteBuilder extends BaseRouteBuilder {
 	  	 .to("direct:callSSO")
 	     .setHeader(Exchange.HTTP_METHOD, constant("GET"))
 	     .setHeader("Content-Type", constant("application/json"))
-	     .to("direct:callSSO")
 		 .to("http4://{{internal.servece.host}}/?bridgeEndpoint=true&amp;throwExceptionOnFailure=false")
 		 .setHeader("Content-Type", constant("application/json"));
   }
